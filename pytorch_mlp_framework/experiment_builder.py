@@ -45,6 +45,7 @@ class ExperimentBuilder(nn.Module):
             print(self.device)
 
         print('here')
+        print('here2')
 
         self.model.reset_parameters()  # re-initialize network parameters
         self.train_data = train_data
