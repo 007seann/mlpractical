@@ -11,9 +11,7 @@ from pytorch_mlp_framework.storage_utils import save_statistics
 from matplotlib import pyplot as plt
 import matplotlib
 matplotlib.rcParams.update({'font.size': 8})
-print("outside experiment builder")
 class ExperimentBuilder(nn.Module):
-    print("inside the class above init")
     def __init__(self, network_model, experiment_name, num_epochs, train_data, val_data,
                  test_data, weight_decay_coefficient, use_gpu, continue_from_epoch=-1):
         """
@@ -45,7 +43,6 @@ class ExperimentBuilder(nn.Module):
             self.device = torch.device('cpu')  # sets the device to be CPU
             print(self.device)
 
-        print('here')
         print('here2')
 
         self.model.reset_parameters()  # re-initialize network parameters
@@ -152,11 +149,9 @@ class ExperimentBuilder(nn.Module):
         """
         Complete the code in the block below to collect absolute mean of the gradients for each layer in all_grads with the             layer names in layers.
         """
-        print('hihihi')
-        print('named_parametersss:', named_parameters)
         for n, p in named_parameters:
-            print('Layer:', n, 'Gradient:', p.grad)
-            layer_name = n.relace('layer_dict.', '_')
+
+            layer_name = n.replace('layer_dict.', '_')
             layer_name = layer_name.replace('.','')
             if layer_name.startwith('_'):
                 layer_name = layer_name[1:]
