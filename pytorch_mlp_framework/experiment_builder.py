@@ -153,7 +153,7 @@ class ExperimentBuilder(nn.Module):
 
             layer_name = n.replace('layer_dict.', '_')
             layer_name = layer_name.replace('.','')
-            if layer_name.startwith('_'):
+            if layer_name.startswith('_'):
                 layer_name = layer_name[1:]
             layers.append(layer_name.replace('weight',''))
             all_grads.append(p.grad.abs().mean())        
