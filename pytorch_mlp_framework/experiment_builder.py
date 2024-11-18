@@ -11,8 +11,9 @@ from pytorch_mlp_framework.storage_utils import save_statistics
 from matplotlib import pyplot as plt
 import matplotlib
 matplotlib.rcParams.update({'font.size': 8})
-
+print("outside experiment builder")
 class ExperimentBuilder(nn.Module):
+    print("inside the class above init")
     def __init__(self, network_model, experiment_name, num_epochs, train_data, val_data,
                  test_data, weight_decay_coefficient, use_gpu, continue_from_epoch=-1):
         """
