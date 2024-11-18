@@ -122,13 +122,11 @@ class ExperimentBuilder(nn.Module):
         :param layers: Layer names corresponding to the model parameters
         :return: plot for gradient flow
         """
-        all_grads = [grad.cpu().detach().numpy() for grad in all_grads]
+        # all_grads = [grad.cpu().detach().numpy() for grad in all_grads]
         plt.plot(all_grads, alpha=0.3, color="b")
         plt.hlines(0, 0, len(all_grads)+1, linewidth=1, color="k" )
         plt.xticks(range(0,len(all_grads), 1), layers, rotation="vertical")
-        print('all_grads1:', all_grads)
         plt.xlim(xmin=0, xmax=len(all_grads))
-        print('all_grads2:', all_grads)
         plt.xlabel("Layers")
         plt.ylabel("Average Gradient")
         plt.title("Gradient flow")
@@ -157,7 +155,7 @@ class ExperimentBuilder(nn.Module):
                 if layer_name.startswith('_'):
                     layer_name = layer_name[1:]
                 layers.append(layer_name.replace('weight',''))
-                all_grads.append(p.grad.abs().mean())        
+                all_grads.append(p.grad.abs().mean().cpu().detach().numpy())        
             
                 
         plt = self.plot_func_def(all_grads, layers)
