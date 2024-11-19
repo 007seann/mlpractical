@@ -204,7 +204,7 @@ class ExperimentBuilder(nn.Module):
         return loss.cpu().data.numpy(), accuracy
 
     def save_model(self, model_save_dir, model_save_name, model_idx, best_validation_model_idx,
-                   best_validation_model_acc):
+                best_validation_model_acc):
         """
         Save the network parameter state and current best val epoch idx and best val accuracy.
         :param model_save_name: Name to use to save model without the epoch index
@@ -295,7 +295,7 @@ class ExperimentBuilder(nn.Module):
             
             ################################################################
             ##### Plot Gradient Flow at each Epoch during Training  ######
-            print('wtf')
+
             print("Generating Gradient Flow Plot at epochh {}".format(epoch_idx))
             print('self.model.named_parameters():', self.model.named_parameters())
             plt = self.plot_grad_flow(self.model.named_parameters())
@@ -313,7 +313,7 @@ class ExperimentBuilder(nn.Module):
         with tqdm.tqdm(total=len(self.test_data)) as pbar_test:  # ini a progress bar
             for x, y in self.test_data:  # sample batch
                 loss, accuracy = self.run_evaluation_iter(x=x,
-                                                          y=y)  # compute loss and accuracy by running an evaluation step
+                                                        y=y)  # compute loss and accuracy by running an evaluation step
                 current_epoch_losses["test_loss"].append(loss)  # save test loss
                 current_epoch_losses["test_acc"].append(accuracy)  # save test accuracy
                 pbar_test.update(1)  # update progress bar status

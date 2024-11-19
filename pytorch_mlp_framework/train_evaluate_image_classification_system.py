@@ -28,20 +28,27 @@ transform_test = transforms.Compose([
 ])
 
 train_data = data_providers.CIFAR100(root='data', set_name='train',
-                 transform=transform_train,
-                 download=True)  # initialize our rngs using the argument set seed
+                transform=transform_train,
+                download=True)  # initialize our rngs using the argument set seed
 val_data = data_providers.CIFAR100(root='data', set_name='val',
-                 transform=transform_test,
-                 download=True)  # initialize our rngs using the argument set seed
+                transform=transform_test,
+                download=True)  # initialize our rngs using the argument set seed
 test_data = data_providers.CIFAR100(root='data', set_name='test',
-                 transform=transform_test,
-                 download=True)  # initialize our rngs using the argument set seed
+                transform=transform_test,
+                download=True)  # initialize our rngs using the argument set seed
 
 train_data_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers=2)
 val_data_loader = DataLoader(val_data, batch_size=args.batch_size, shuffle=True, num_workers=2)
 test_data_loader = DataLoader(test_data, batch_size=args.batch_size, shuffle=True, num_workers=2)
 
-if args.block_type == 'conv_block':
+if args.block_type == 'bn':
+    processing_block_type = ConvolutionalProcessingBlockBN
+    dim_reduction_block_type = ConvolutionalDimensionalityReductionBlockBN
+# elif args.block_type == 'bn+rc':
+#     processing_block_type = ConvolutionalProcessingBlock2 #3
+#     dim_reduction_block_type = ConvolutionalDimensionalityReductionBlock2 #3
+
+elif args.block_type == 'conv_block':
     processing_block_type = ConvolutionalProcessingBlock
     dim_reduction_block_type = ConvolutionalDimensionalityReductionBlock
 elif args.block_type == 'empty_block':
