@@ -367,9 +367,7 @@ class ConvolutionalProcessingBlockBN(nn.Module):
         self.padding = padding
         self.bias = bias
         self.dilation = dilation
-        
-        self.gamma = nn.Parameter(torch.ones(num_filters))
-        self.beta = nn.Parameter(torch.zeros(num_filters))
+
 
         self.build_module()
     
@@ -424,9 +422,7 @@ class ConvolutionalDimensionalityReductionBlockBN(nn.Module):
         self.bias = bias
         self.dilation = dilation
         self.reduction_factor = reduction_factor
-        
-        self.gamma = nn.Parameter(torch.ones(num_filters))
-        self.beta = nn.Parameter(torch.zeros(num_filters))
+
         
         self.build_module()
         
