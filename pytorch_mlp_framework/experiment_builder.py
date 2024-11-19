@@ -162,8 +162,7 @@ class ExperimentBuilder(nn.Module):
         
         return plt
     
-    
-    
+
     
     def run_train_iter(self, x, y):
         
@@ -321,7 +320,7 @@ class ExperimentBuilder(nn.Module):
                     "loss: {:.4f}, accuracy: {:.4f}".format(loss, accuracy))  # update progress bar string output
 
         test_losses = {key: [np.mean(value)] for key, value in
-                       current_epoch_losses.items()}  # save test set metrics in dict format
+                    current_epoch_losses.items()}  # save test set metrics in dict format
         save_statistics(experiment_log_dir=self.experiment_logs, filename='test_summary.csv',
                         # save test set metrics on disk in .csv format
                         stats_dict=test_losses, current_epoch=0, continue_from_mode=False)
