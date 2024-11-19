@@ -341,7 +341,7 @@ class ConvolutionalNetwork(nn.Module):
         
 #########################################   Implementation   #######################################################
 # BN
-@overwrite
+
 class BatchNorm2d(nn.Module):
     def __init__(self, num_filters):
         super(BatchNorm2d, self).__init__()
