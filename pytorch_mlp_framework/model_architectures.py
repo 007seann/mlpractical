@@ -343,11 +343,11 @@ class ConvolutionalNetwork(nn.Module):
 # BN
 
 class BatchNorm2d(nn.Module):
-    def __init__(self, num_filters, eta):
+    def __init__(self, num_filters):
         super(BatchNorm2d, self).__init__()
         self.gamma = nn.Parameter(torch.ones(num_filters))
         self.beta = nn.Parameter(torch.zeros(num_filters))
-        self.eta = eta
+        self.eta = 1e6
 
     def forward(self, x):
         B, C, H, W = x.shape
@@ -378,12 +378,12 @@ class ConvolutionalProcessingBlockBN(nn.Module):
         self.layer_dict = nn.ModuleDict()
         x = torch.zeros(self.input_shape)
         out = x
-        eta = 1e-3
+
 
         self.layer_dict['conv_0'] = nn.Conv2d(in_channels=out.shape[1], out_channels=self.num_filters, bias=self.bias,
                                             kernel_size=self.kernel_size, dilation=self.dilation,
                                             padding=self.padding, stride=1)
-        self.layer_dict['batch_norm_0'] = BatchNorm2d(self.num_filters, eta)
+        self.layer_dict['batch_norm_0'] = BatchNorm2d(self.num_filters)
 
         out = self.layer_dict['conv_0'].forward(out)
         out = self.layer_dict['batch_norm_0'].forward(out)
@@ -392,7 +392,7 @@ class ConvolutionalProcessingBlockBN(nn.Module):
         self.layer_dict['conv_1'] = nn.Conv2d(in_channels=out.shape[1], out_channels=self.num_filters, bias=self.bias,
                                             kernel_size=self.kernel_size, dilation=self.dilation,
                                             padding=self.padding, stride=1)
-        self.layer_dict['batch_norm_1'] = BatchNorm2d(self.num_filters, eta)
+        self.layer_dict['batch_norm_1'] = BatchNorm2d(self.num_filters)
 
         out = self.layer_dict['conv_1'].forward(out)
         out = self.layer_dict['batch_norm_1'].forward(out)
@@ -433,12 +433,11 @@ class ConvolutionalProcessingBlockBNRC(nn.Module):
         x = torch.zeros(self.input_shape)
         out = x
         identity = x
-        eta = 1e-2
 
         self.layer_dict['conv_0'] = nn.Conv2d(in_channels=out.shape[1], out_channels=self.num_filters, bias=self.bias,
                                             kernel_size=self.kernel_size, dilation=self.dilation,
                                             padding=self.padding, stride=1)
-        self.layer_dict['batch_norm_0'] = BatchNorm2d(self.num_filters, eta)
+        self.layer_dict['batch_norm_0'] = BatchNorm2d(self.num_filters)
 
         out = self.layer_dict['conv_0'].forward(out)
         out = self.layer_dict['batch_norm_0'].forward(out)
@@ -447,7 +446,7 @@ class ConvolutionalProcessingBlockBNRC(nn.Module):
         self.layer_dict['conv_1'] = nn.Conv2d(in_channels=out.shape[1], out_channels=self.num_filters, bias=self.bias,
                                             kernel_size=self.kernel_size, dilation=self.dilation,
                                             padding=self.padding, stride=1)
-        self.layer_dict['batch_norm_1'] = BatchNorm2d(self.num_filters, eta)
+        self.layer_dict['batch_norm_1'] = BatchNorm2d(self.num_filters)
 
         out = self.layer_dict['conv_1'].forward(out)
         out = self.layer_dict['batch_norm_1'].forward(out)
@@ -492,13 +491,13 @@ class ConvolutionalDimensionalityReductionBlockBN(nn.Module):
         self.layer_dict = nn.ModuleDict()
         x = torch.zeros(self.input_shape)
         out = x
-        eta = 1e-3
+
 
         self.layer_dict['conv_0'] = nn.Conv2d(in_channels=out.shape[1], out_channels=self.num_filters, bias=self.bias,
                                             kernel_size=self.kernel_size, dilation=self.dilation,
                                             padding=self.padding, stride=1)
         
-        self.layer_dict['batch_norm_0'] = BatchNorm2d(self.num_filters, eta)
+        self.layer_dict['batch_norm_0'] = BatchNorm2d(self.num_filters)
 
         out = self.layer_dict['conv_0'].forward(out)
         out = self.layer_dict['batch_norm_0'].forward(out)
@@ -509,7 +508,7 @@ class ConvolutionalDimensionalityReductionBlockBN(nn.Module):
         self.layer_dict['conv_1'] = nn.Conv2d(in_channels=out.shape[1], out_channels=self.num_filters, bias=self.bias,
                                             kernel_size=self.kernel_size, dilation=self.dilation,
                                             padding=self.padding, stride=1)
-        self.layer_dict['batch_norm_1'] = BatchNorm2d(self.num_filters, eta)
+        self.layer_dict['batch_norm_1'] = BatchNorm2d(self.num_filters)
 
         out = self.layer_dict['conv_1'].forward(out)
         out = self.layer_dict['batch_norm_1'].forward(out)
@@ -554,13 +553,13 @@ class ConvolutionalDimensionalityReductionBlockBNRC(nn.Module):
         x = torch.zeros(self.input_shape)
         out = x
         identity = x
-        eta = 1e-2
+
 
         self.layer_dict['conv_0'] = nn.Conv2d(in_channels=out.shape[1], out_channels=self.num_filters, bias=self.bias,
                                             kernel_size=self.kernel_size, dilation=self.dilation,
                                             padding=self.padding, stride=1)
         
-        self.layer_dict['batch_norm_0'] = BatchNorm2d(self.num_filters, eta)
+        self.layer_dict['batch_norm_0'] = BatchNorm2d(self.num_filters)
 
         out = self.layer_dict['conv_0'].forward(out)
         out = self.layer_dict['batch_norm_0'].forward(out)
@@ -571,7 +570,7 @@ class ConvolutionalDimensionalityReductionBlockBNRC(nn.Module):
         self.layer_dict['conv_1'] = nn.Conv2d(in_channels=out.shape[1], out_channels=self.num_filters, bias=self.bias,
                                             kernel_size=self.kernel_size, dilation=self.dilation,
                                             padding=self.padding, stride=1)
-        self.layer_dict['batch_norm_1'] = BatchNorm2d(self.num_filters, eta)
+        self.layer_dict['batch_norm_1'] = BatchNorm2d(self.num_filters)
 
         out = self.layer_dict['conv_1'].forward(out)
         out = self.layer_dict['batch_norm_1'].forward(out)
