@@ -347,7 +347,7 @@ class BatchNorm2d(nn.Module):
         super(BatchNorm2d, self).__init__()
         self.gamma = nn.Parameter(torch.ones(num_filters))
         self.beta = nn.Parameter(torch.zeros(num_filters))
-        self.eta = 1e6
+        self.eta = 1e-6
 
     def forward(self, x):
         B, C, H, W = x.shape
