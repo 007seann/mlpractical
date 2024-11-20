@@ -358,8 +358,8 @@ class BatchNorm2d(nn.Module):
     def forward(self, x):
         B, C, H, W = x.shape
         
-        self.running_mean = self.running_mean.to(x.device)
-        self.running_var = self.running_var.to(x.device)
+        # self.running_mean = self.running_mean.to(x.device)
+        # self.running_var = self.running_var.to(x.device)
         
         if self.training: # Training mode
             
