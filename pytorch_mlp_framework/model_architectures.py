@@ -343,7 +343,7 @@ class ConvolutionalNetwork(nn.Module):
 # BN
 
 class BatchNorm2d(nn.Module):
-    def __init__(self, num_filters, momentum=0.1, eta=1e-3):
+    def __init__(self, num_filters, momentum=0.1, eta=1e-5):
         super(BatchNorm2d, self).__init__()
         self.gamma = nn.Parameter(torch.ones(num_filters))
         self.beta = nn.Parameter(torch.zeros(num_filters))
@@ -351,13 +351,13 @@ class BatchNorm2d(nn.Module):
         self.momentum = momentum
         
         # Running statistics for inference
-        self.running_mean = torch.zeros(num_filters)
-        self.running_var = torch.ones(num_filters)
+        
+        self.register_buffer('running_mean', torch.zeros(num_filters))
+        self.register_buffer('running_var', torch.ones(num_filters))
 
     def forward(self, x):
         B, C, H, W = x.shape
         
-        # Move running statistics to the same device as input x
         self.running_mean = self.running_mean.to(x.device)
         self.running_var = self.running_var.to(x.device)
         
