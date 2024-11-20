@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+torch.cuda.empty_cache()
 
 
 class FCCNetwork(nn.Module):
