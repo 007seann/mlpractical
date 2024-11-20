@@ -432,7 +432,7 @@ class BatchNorm2d(nn.Module):
             # Use batch statistics for normalization
             mean = batch_mean
             var = batch_var
-            torch.cuda.empty_cache()
+
         else:  # Inference mode
             # Use running statistics for normalization
             mean = self.running_mean
