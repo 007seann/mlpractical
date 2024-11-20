@@ -642,7 +642,7 @@ class ConvolutionalDimensionalityReductionBlockBNRC(nn.Module):
         self.layer_dict = nn.ModuleDict()
         x = torch.zeros(self.input_shape)
         out = x
-        identity = x
+
 
 
         self.layer_dict['conv_0'] = nn.Conv2d(in_channels=out.shape[1], out_channels=self.num_filters, bias=self.bias,
@@ -664,14 +664,14 @@ class ConvolutionalDimensionalityReductionBlockBNRC(nn.Module):
 
         out = self.layer_dict['conv_1'](out)
         out = self.layer_dict['batch_norm_1'](out)
-        out += identity
+
         out = F.leaky_relu(out)
 
         print(out.shape)
 
     def forward(self, x):
         out = x
-        identity = x
+
 
         out = self.layer_dict['conv_0'](out)
         out = self.layer_dict['batch_norm_0'](out)
@@ -681,7 +681,7 @@ class ConvolutionalDimensionalityReductionBlockBNRC(nn.Module):
 
         out = self.layer_dict['conv_1'](out)
         out = self.layer_dict['batch_norm_1'](out)
-        out += identity
+
         out = F.leaky_relu(out)
 
         return out
