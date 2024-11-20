@@ -357,7 +357,13 @@ class BatchNorm2d(nn.Module):
     def forward(self, x):
         B, C, H, W = x.shape
         
-        if self.training:
+        # Move running statistics to the same device as input x
+        self.running_mean = self.running_mean.to(x.device)
+        self.running_var = self.running_var.to(x.device)
+        
+        if self.training: # Training mode
+            
+            # Compute batch statistics
             batch_mean = torch.mean(x, dim=(0, 2, 3), keepdim=True) 
             batch_var = torch.mean((x - batch_mean) ** 2, dim=(0, 2, 3), keepdim=True)
         
@@ -365,20 +371,21 @@ class BatchNorm2d(nn.Module):
             self.running_mean = (1 - self.momentum) * self.running_mean + self.momentum * batch_mean.view(-1)
             self.running_var = (1 - self.momentum) * self.running_var + self.momentum * batch_var.view(-1)
             
+            # Use batch statstics for normalisation
             mean = batch_mean
             var = batch_var
         
         else: # Inference mode
+            
+            # Use running statistics for normalisation
             mean = self.running_mean.view(1, C, 1 ,1)
             var = self.running_var.view(1, C, 1, 1)
             
-        
-            
-    
+        # Normalisse the input
         gamma = self.gamma.view(1, C, 1, 1)
         beta = self.beta.view(1, C, 1, 1)
-        x_norm = (x - mean) / (torch.sqrt(var + self.eta))
-        res = x_norm * gamma + beta
+        x_norm = (x - mean) / (torch.sqrt(var + self.eta)) # Apply normalisation
+        res = x_norm * gamma + beta # Scale and shift
         return res
     
 
