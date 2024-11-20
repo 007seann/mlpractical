@@ -150,6 +150,8 @@ class ExperimentBuilder(nn.Module):
         """
         for n, p in named_parameters:
             if p.requires_grad and ('bias' not in n):
+                print( "parameters",p)
+                print('para.grade', p.grad)
                 layer_name = n.replace('layer_dict.', '_')
                 layer_name = layer_name.replace('.','')
                 if layer_name.startswith('_'):
