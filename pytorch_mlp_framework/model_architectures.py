@@ -387,7 +387,8 @@ class BatchNorm2d(nn.Module):
         # Normalize the input
         gamma = self.gamma.view(1, C, 1, 1)
         beta = self.beta.view(1, C, 1, 1)
-        # x_norm = (x - mean) / (torch.sqrt(var + self.eta)) # Apply normalizationA
+        # x_norm = (x - mean) / (torch.sqrt(var + self.eta)) # Apply normalization
+        x_norm = (x - mean.view(1, C, 1, 1)) / (torch.sqrt(var.view(1, C, 1, 1) + self.eta))
         res = x_norm * gamma + beta # Scale and shift
         return res
     
