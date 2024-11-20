@@ -368,12 +368,12 @@ class BatchNorm2d(nn.Module):
             batch_var = torch.mean((x - batch_mean) ** 2, dim=(0, 2, 3), keepdim=True)
         
             # # Update running statistics
-            # self.running_mean = self.momentum * self.running_mean + (1 - self.momentum) * batch_mean
-            # self.running_var = self.momentum * self.running_var + (1 - self.momentum) * batch_var
+            self.running_mean = self.momentum * self.running_mean + (1 - self.momentum) * batch_mean
+            self.running_var = self.momentum * self.running_var + (1 - self.momentum) * batch_var
             
             # Update running statistics in-place to save memory
-            self.running_mean.mul_(self.momentum).add_((1 - self.momentum) * batch_mean)
-            self.running_var.mul_(self.momentum).add_((1 - self.momentum) * batch_var)
+            # self.running_mean.mul_(self.momentum).add_((1 - self.momentum) * batch_mean)
+            # self.running_var.mul_(self.momentum).add_((1 - self.momentum) * batch_var)
             
             # Use batch statistics for normalization
             mean = batch_mean
