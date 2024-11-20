@@ -393,7 +393,7 @@ class BatchNorm2d(nn.Module):
         self.momentum = momentum
         self.x = input
         
-        device = x.devide
+        device = self.x.device
         # Running statistics for inference
         self.running_mean = torch.zeros(num_filters).to(device)
         self.running_var = torch.zeros(num_filters).to(device)
