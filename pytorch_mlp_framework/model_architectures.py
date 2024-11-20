@@ -351,8 +351,8 @@ class BatchNorm2d(nn.Module):
 
     def forward(self, x):
         B, C, H, W = x.shape
-        mean = torch.mean(x, dim=(0, 2, 3), keepdim=True) / (B * W * H)
-        var = torch.mean((x - mean) ** 2, dim=(0, 2, 3), keepdim=True) / (B * W * H)
+        mean = torch.mean(x, dim=(0, 2, 3)) / (B * W * H)
+        var = torch.mean((x - mean) ** 2, dim=(0, 2, 3)) / (B * W * H)
         gamma = self.gamma.view(1, C, 1, 1)
         beta = self.beta.view(1, C, 1, 1)
         res = (((x - mean) * gamma) / (torch.sqrt(var) + self.eta)) + beta
