@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-torch.cuda.empty_cache()
 
 
 class FCCNetwork(nn.Module):
@@ -343,48 +342,6 @@ class ConvolutionalNetwork(nn.Module):
 #########################################   Implementation   #######################################################
 # BN
 
-# class BatchNorm2d(nn.Module):
-#     def __init__(self, num_filters, momentum=0.1, eta=1e-5):
-#         super(BatchNorm2d, self).__init__()
-#         self.gamma = nn.Parameter(torch.ones(num_filters))
-#         self.beta = nn.Parameter(torch.zeros(num_filters))
-#         self.eta = eta
-#         self.momentum = momentum
-        
-#         # Running statistics for inference
-#         self.running_mean = torch.zeros(num_filters)
-#         self.running_var = torch.zeros(num_filters)
-
-#     def forward(self, x):
-#         B, C, H, W = x.shape
-        
-#         if self.training: # Training mode
-            
-#             # Compute batch statistics
-#             batch_mean = torch.mean(x, dim=(0, 2, 3), keepdim=True) 
-#             batch_var = torch.mean((x - batch_mean) ** 2, dim=(0, 2, 3), keepdim=True)
-        
-#             # Update running statistics
-#             self.running_mean = self.momentum * self.running_mean + (1 - self.momentum) * batch_mean
-#             self.running_var = self.momentum * self.running_var + (1 - self.momentum) * batch_var
-            
-#             # Use batch statstics for normalisation
-#             mean = batch_mean
-#             var = batch_var
-        
-#         else: # Inference mode
-            
-#             # Use running statistics for normalisation
-#             mean = self.running_mean.view(1, C, 1 ,1)
-#             var = self.running_var.view(1, C, 1, 1)
-            
-#         # Normalisse the input
-#         gamma = self.gamma.view(1, C, 1, 1)
-#         beta = self.beta.view(1, C, 1, 1)
-#         x_norm = (x - mean) / (torch.sqrt(var + self.eta)) # Apply normalisation
-#         res = x_norm * gamma + beta # Scale and shift
-#         return res
-
 class BatchNorm2d(nn.Module):
     def __init__(self, num_filters, momentum=0.1, eta=1e-5):
         super(BatchNorm2d, self).__init__()
@@ -407,12 +364,16 @@ class BatchNorm2d(nn.Module):
         if self.training: # Training mode
             
             # Compute batch statistics
-            batch_mean = torch.mean(x, dim=(0, 2, 3), keepdim=True) 
-            batch_var = torch.mean((x - batch_mean) ** 2, dim=(0, 2, 3), keepdim=True)
+            batch_mean = torch.mean(x, dim=(0, 2, 3)) 
+            batch_var = torch.mean((x - batch_mean) ** 2, dim=(0, 2, 3))
         
-            # Update running statistics
-            self.running_mean = self.momentum * self.running_mean + (1 - self.momentum) * batch_mean
-            self.running_var = self.momentum * self.running_var + (1 - self.momentum) * batch_var
+            # # Update running statistics
+            # self.running_mean = self.momentum * self.running_mean + (1 - self.momentum) * batch_mean
+            # self.running_var = self.momentum * self.running_var + (1 - self.momentum) * batch_var
+            
+            # Update running statistics in-place to save memory
+            self.running_mean.mul_(self.momentum).add_((1 - self.momentum) * batch_mean)
+            self.running_var.mul_(self.momentum).add_((1 - self.momentum) * batch_var)
             
             # Use batch statistics for normalization
             mean = batch_mean
@@ -420,13 +381,13 @@ class BatchNorm2d(nn.Module):
         
         else: # Inference mode
             # Use running statistics for normalization
-            mean = self.running_mean.view(1, C, 1, 1)
-            var = self.running_var.view(1, C, 1, 1)
+            mean = self.running_mean
+            var = self.running_var
             
         # Normalize the input
         gamma = self.gamma.view(1, C, 1, 1)
         beta = self.beta.view(1, C, 1, 1)
-        x_norm = (x - mean) / (torch.sqrt(var + self.eta)) # Apply normalization
+        x_norm = (x - mean.view(1, C, 1, 1)) / (torch.sqrt(var.view(1, C, 1, 1) + self.eta))
         res = x_norm * gamma + beta # Scale and shift
         return res
     
