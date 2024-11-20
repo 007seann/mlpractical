@@ -347,12 +347,12 @@ class BatchNorm2d(nn.Module):
         super(BatchNorm2d, self).__init__()
         self.gamma = nn.Parameter(torch.ones(num_filters))
         self.beta = nn.Parameter(torch.zeros(num_filters))
-        self.eta = 1e-6
+        self.eta = 1e-3
 
     def forward(self, x):
         B, C, H, W = x.shape
-        mean = torch.mean(x, dim=(0, 2, 3)) / (B * W * H)
-        var = torch.mean((x - mean) ** 2, dim=(0, 2, 3)) / (B * W * H)
+        mean = torch.mean(x, dim=(0, 2, 3), keepdim=True) / (B * W * H)
+        var = torch.mean((x - mean) ** 2, dim=(0, 2, 3), keepdim=True) / (B * W * H)
         gamma = self.gamma.view(1, C, 1, 1)
         beta = self.beta.view(1, C, 1, 1)
         res = (((x - mean) * gamma) / (torch.sqrt(var) + self.eta)) + beta
