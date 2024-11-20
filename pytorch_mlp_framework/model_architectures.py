@@ -377,7 +377,7 @@ class BatchNorm2d(nn.Module):
     
         gamma = self.gamma.view(1, C, 1, 1)
         beta = self.beta.view(1, C, 1, 1)
-        x_norm = (x - mean) / (torch.sqrt(var + self.eta)
+        x_norm = (x - mean) / (torch.sqrt(var + self.eta))
         res = x_norm * gamma + beta
         return res
     
