@@ -352,15 +352,14 @@ class BatchNorm2d(nn.Module):
         
         # Running statistics for inference
         
-        # self.running_mean = torch.zeros(num_filters)
-        # self.running_var = torch.nons(num_filters)
+
         
         # Running statistics for inference
         self.register_buffer('running_mean', torch.zeros(num_filters))
         self.register_buffer('running_var', torch.zeros(num_filters))
 
     def forward(self, x):
-
+        B, C, H, W = x.shape
         
         if self.training: # Training mode
             
