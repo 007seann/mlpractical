@@ -363,8 +363,10 @@ class BatchNorm2d(nn.Module):
         if self.training: # Training mode
 
             # Compute batch statistics
-            batch_mean = torch.mean(x, dim=(0, 2, 3), keepdim=True, unbiased=False) 
-            batch_var = torch.mean((x - batch_mean) ** 2, dim=(0, 2, 3), keepdim=True, unbiased=False)
+            batch_mean = torch.mean(x, dim=(0, 2, 3), keepdim=True) 
+            # batch_var = torch.mean((x - batch_mean) ** 2, dim=(0, 2, 3), keepdim=True, unbiased=False)
+            batch_var = torch.var(x, dim=(0, 2, 3), unbiased=False, keepdim=True)
+
         
             # # Update running statistics
             self.running_mean = self.momentum * self.running_mean + (1 - self.momentum) * batch_mean
