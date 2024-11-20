@@ -343,25 +343,49 @@ class ConvolutionalNetwork(nn.Module):
 # BN
 
 class BatchNorm2d(nn.Module):
-    def __init__(self, num_filters):
+    def __init__(self, num_filters, momentum=0.1, eta=1e-3):
         super(BatchNorm2d, self).__init__()
         self.gamma = nn.Parameter(torch.ones(num_filters))
         self.beta = nn.Parameter(torch.zeros(num_filters))
-        self.eta = 1e-3
+        self.eta = eta
+        self.momentum = momentum
+        
+        # Running statistics for inference
+        self.running_mean = torch.zeros(num_filters)
+        self.running_var = torch.ones(num_filters)
 
     def forward(self, x):
         B, C, H, W = x.shape
-        mean = torch.mean(x, dim=(0, 2, 3), keepdim=True) / (B * W * H)
-        var = torch.mean((x - mean) ** 2, dim=(0, 2, 3), keepdim=True) / (B * W * H)
+        
+        if self.training:
+            batch_mean = torch.mean(x, dim=(0, 2, 3), keepdim=True) 
+            batch_var = torch.mean((x - mean) ** 2, dim=(0, 2, 3), keepdim=True)
+        
+            # Update running statistics
+            self.running_mean = (1 - self.momentum) * self.running_mean + self.momentum * batch_mean.view(-1)
+            self.running_var = (1 - self.momentum) * self.running_var + self.momentum * batch_var.view(-1)
+            
+            mean = batch_mean
+            var = batch_var
+        
+        else: # Inference mode
+            mean = self.running_mean.view(1, C, 1 ,1)
+            var = self.running_var.view(1, C, 1, 1)
+            
+        
+            
+    
         gamma = self.gamma.view(1, C, 1, 1)
         beta = self.beta.view(1, C, 1, 1)
-        res = (((x - mean) * gamma) / (torch.sqrt(var) + self.eta)) + beta
+        x_norm = (x - mean) / (torch.sqrt(var + self.eta)
+        res = x_norm * gamma + beta
         return res
     
 
 class ConvolutionalProcessingBlockBN(nn.Module):
     def __init__(self, input_shape, num_filters, kernel_size, padding, bias, dilation):
         super(ConvolutionalProcessingBlockBN, self).__init__()
+
 
         self.num_filters = num_filters
         self.kernel_size = kernel_size
