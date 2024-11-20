@@ -393,12 +393,12 @@ class BatchNorm2d(nn.Module):
         self.momentum = momentum
         
         # Running statistics for inference
-        self.register_buffer('running_mean', torch.zeros(num_filters))
-        self.register_buffer('running_var', torch.zeros(num_filters))
+        self.running_mean = torch.zeros(num_filters)
+        self.running_var = torch.zeros(num_filters)
 
     def forward(self, x):
         B, C, H, W = x.shape
-        device = x.device
+
         
         if self.training: # Training mode
             
@@ -406,7 +406,7 @@ class BatchNorm2d(nn.Module):
             batch_mean = torch.mean(x, dim=(0, 2, 3), keepdim=True) 
             batch_var = torch.mean((x - batch_mean) ** 2, dim=(0, 2, 3), keepdim=True)
         
-            # Update running statistics on CPU
+            # Update running statistics
             self.running_mean = self.momentum * self.running_mean + (1 - self.momentum) * batch_mean
             self.running_var = self.momentum * self.running_var + (1 - self.momentum) * batch_var
             
@@ -417,8 +417,8 @@ class BatchNorm2d(nn.Module):
         else: # Inference mode
             
             # Use running statistics for normalization
-            mean = self.running_mean.view(1, C, 1, 1).to(device)
-            var = self.running_var.view(1, C, 1, 1).to(device)
+            mean = self.running_mean.view(1, C, 1, 1)
+            var = self.running_var.view(1, C, 1, 1)
             
         # Normalize the input
         gamma = self.gamma.view(1, C, 1, 1)
