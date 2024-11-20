@@ -550,7 +550,7 @@ class ConvolutionalProcessingBlockBNRC(nn.Module):
         identity = x
 
         out = self.layer_dict['conv_0'](out)
-        oout = self.layer_dict['batch_norm_0'](out)
+        out = self.layer_dict['batch_norm_0'](out)
         out = F.leaky_relu(out)
 
         out = self.layer_dict['conv_1'](out)
