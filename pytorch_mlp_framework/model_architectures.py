@@ -342,56 +342,108 @@ class ConvolutionalNetwork(nn.Module):
 #########################################   Implementation   #######################################################
 # BN
 
+# class BatchNorm2d(nn.Module):
+#     def __init__(self, num_filters, momentum=0.1, eta=1e-5):
+#         super(BatchNorm2d, self).__init__()
+#         self.gamma = nn.Parameter(torch.ones(num_filters))
+#         self.beta = nn.Parameter(torch.zeros(num_filters))
+#         self.eta = eta
+#         self.momentum = momentum
+        
+#         self.register_buffer('running_mean', torch.zeros(num_filters))  # Default on CPU
+#         self.register_buffer('running_var', torch.ones(num_filters))   # Default on CPU
+        
+#     def forward(self, x):
+#         B, C, H, W = x.shape
+#         device = x.device
+        
+#         self.running_mean = self.running_mean.to(device)
+#         self.running_var = self.running_var.to(device)
+
+#         if self.training: # Training mode
+
+#             # Compute batch statistics
+#             batch_mean = torch.mean(x, dim=(0, 2, 3), keepdim=True) 
+#             batch_var = torch.var(x, dim=(0, 2, 3), unbiased=False, keepdim=True)
+
+        
+#             # # Update running statistics
+#             self.running_mean = self.momentum * self.running_mean + (1 - self.momentum) * batch_mean
+#             self.running_var = self.momentum * self.running_var + (1 - self.momentum) * batch_var
+            
+#             # Update running statistics in-place to save memory
+#             # self.running_mean.mul_(self.momentum).add_((1 - self.momentum) * batch_mean)
+#             # self.running_var.mul_(self.momentum).add_((1 - self.momentum) * batch_var)
+            
+#             # Use batch statistics for normalization
+#             mean = batch_mean
+#             var = batch_var
+        
+#         else: # Inference mode
+#             # Use running statistics for normalization
+#             mean = self.running_mean
+#             var = self.running_var
+            
+#         # Normalize the input
+#         gamma = self.gamma.view(1, C, 1, 1)
+#         beta = self.beta.view(1, C, 1, 1)
+#         # x_norm = (x - mean) / (torch.sqrt(var + self.eta)) # Apply normalization
+#         x_norm = (x - mean.view(1, C, 1, 1)) / (torch.sqrt(var.view(1, C, 1, 1) + self.eta))
+#         res = x_norm * gamma + beta # Scale and shift
+#         return res
+
+import torch
+import torch.nn as nn
+
 class BatchNorm2d(nn.Module):
-    def __init__(self, num_filters, momentum=0.1, eta=1e-5):
+    def __init__(self, num_filters, eta=1e-5):
         super(BatchNorm2d, self).__init__()
-        self.gamma = nn.Parameter(torch.ones(num_filters))
-        self.beta = nn.Parameter(torch.zeros(num_filters))
+        self.gamma = nn.Parameter(torch.ones(num_filters))  # Scale parameter
+        self.beta = nn.Parameter(torch.zeros(num_filters))  # Shift parameter
         self.eta = eta
-        self.momentum = momentum
-        
-        self.register_buffer('running_mean', torch.zeros(num_filters))  # Default on CPU
-        self.register_buffer('running_var', torch.ones(num_filters))   # Default on CPU
-        
+
+        self.register_buffer('running_mean', torch.zeros(num_filters))  # Running mean
+        self.register_buffer('running_var', torch.ones(num_filters))   # Running variance
+        self.register_buffer('batch_count', torch.tensor(0, dtype=torch.float32))  # Track batch count for averaging
+
     def forward(self, x):
         B, C, H, W = x.shape
         device = x.device
-        
+
+        # Ensure running statistics are on the same device as the input
         self.running_mean = self.running_mean.to(device)
         self.running_var = self.running_var.to(device)
+        self.batch_count = self.batch_count.to(device)
 
-        if self.training: # Training mode
-
+        if self.training:  # Training mode
             # Compute batch statistics
-            batch_mean = torch.mean(x, dim=(0, 2, 3), keepdim=True) 
-            # batch_var = torch.mean((x - batch_mean) ** 2, dim=(0, 2, 3), keepdim=True, unbiased=False)
-            batch_var = torch.var(x, dim=(0, 2, 3), unbiased=False, keepdim=True)
+            batch_mean = torch.mean(x, dim=(0, 2, 3))  # Shape: (C,)
+            batch_var = torch.var(x, dim=(0, 2, 3), unbiased=False)  # Shape: (C,)
 
-        
-            # # Update running statistics
-            self.running_mean = self.momentum * self.running_mean + (1 - self.momentum) * batch_mean
-            self.running_var = self.momentum * self.running_var + (1 - self.momentum) * batch_var
-            
-            # Update running statistics in-place to save memory
-            # self.running_mean.mul_(self.momentum).add_((1 - self.momentum) * batch_mean)
-            # self.running_var.mul_(self.momentum).add_((1 - self.momentum) * batch_var)
-            
+            # Update running statistics using cumulative moving average
+            self.batch_count += 1  # Increment batch counter
+            new_mean = (self.running_mean * (self.batch_count - 1) + batch_mean) / self.batch_count
+            new_var = (self.running_var * (self.batch_count - 1) + batch_var) / self.batch_count
+
+            # Assign updated values
+            self.running_mean = new_mean
+            self.running_var = new_var
+
             # Use batch statistics for normalization
             mean = batch_mean
             var = batch_var
-        
-        else: # Inference mode
+        else:  # Inference mode
             # Use running statistics for normalization
             mean = self.running_mean
             var = self.running_var
-            
+
         # Normalize the input
         gamma = self.gamma.view(1, C, 1, 1)
         beta = self.beta.view(1, C, 1, 1)
-        # x_norm = (x - mean) / (torch.sqrt(var + self.eta)) # Apply normalization
-        x_norm = (x - mean.view(1, C, 1, 1)) / (torch.sqrt(var.view(1, C, 1, 1) + self.eta))
-        res = x_norm * gamma + beta # Scale and shift
+        x_norm = (x - mean.view(1, C, 1, 1)) / torch.sqrt(var.view(1, C, 1, 1) + self.eta)
+        res = x_norm * gamma + beta  # Scale and shift
         return res
+
     
 
 class ConvolutionalProcessingBlockBN(nn.Module):
