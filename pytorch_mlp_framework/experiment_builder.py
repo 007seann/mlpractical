@@ -115,7 +115,6 @@ class ExperimentBuilder(nn.Module):
 
     def plot_func_def(self,all_grads, layers):
         
-       
         """
         Plot function definition to plot the average gradient with respect to the number of layers in the given model
         :param all_grads: Gradients wrt weights for each layer in the model.
@@ -125,7 +124,7 @@ class ExperimentBuilder(nn.Module):
         # all_grads = [grad.cpu().detach().numpy() for grad in all_grads]
         plt.plot(all_grads, alpha=0.3, color="b")
         plt.hlines(0, 0, len(all_grads)+1, linewidth=1, color="k" )
-        plt.xticks(range(0,len(all_grads), 1), layers, rotation="vertical")
+        plt.xticks(range(0,len(all_grads), 1), layers, rotation="vertical", fontsize=8)
         plt.xlim(xmin=0, xmax=len(all_grads))
         plt.xlabel("Layers")
         plt.ylabel("Average Gradient")
