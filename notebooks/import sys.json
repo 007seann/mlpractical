@@ -1,0 +1,54 @@
+import sys
+from mlp.initialisers import GlorotUniformInit, ConstantInit
+from mlp.models import MultipleLayerModel
+from mlp.layers import AffineLayer, ReluLayer
+from mlp.errors import CrossEntropySoftmaxError
+from mlp.penalties import L1Penalty, L2Penalty
+
+# notebooks/test_05_Non-linearities_and_regularisation.ipynb
+
+sys.path.append('/Users/apple/mlpractical-1')
+
+def test_model_with_penalties():
+    rng = np.random.default_rng(seed=42)
+    
+    # L1 Penalty
+    weights_penalty_l1 = L1Penalty(0.00001)
+    weights_init = GlorotUniformInit(0.5, rng)
+    biases_init = ConstantInit(0.)
+    input_dim, output_dim, hidden_dim = 784, 10, 100
+    model_l1 = MultipleLayerModel([
+        AffineLayer(input_dim, hidden_dim, weights_init,
+                    biases_init, weights_penalty=weights_penalty_l1),
+        ReluLayer(),
+        AffineLayer(hidden_dim, hidden_dim, weights_init,
+                    biases_init, weights_penalty=weights_penalty_l1),
+        ReluLayer(),
+        AffineLayer(hidden_dim, output_dim, weights_init,
+                    biases_init, weights_penalty=weights_penalty_l1),  
+    ])
+    error = CrossEntropySoftmaxError()
+    
+    # Train model with L1 penalty
+    # TODO: Add training code here
+    
+    # L2 Penalty
+    weights_penalty_l2 = L2Penalty(0.00001)
+    model_l2 = MultipleLayerModel([
+        AffineLayer(input_dim, hidden_dim, weights_init,
+                    biases_init, weights_penalty=weights_penalty_l2),
+        ReluLayer(),
+        AffineLayer(hidden_dim, hidden_dim, weights_init,
+                    biases_init, weights_penalty=weights_penalty_l2),
+        ReluLayer(),
+        AffineLayer(hidden_dim, output_dim, weights_init,
+                    biases_init, weights_penalty=weights_penalty_l2),  
+    ])
+    
+    # Train model with L2 penalty
+    # TODO: Add training code here
+    
+    # Verify model performance
+    # TODO: Add assertions to verify model performance
+
+test_model_with_penalties()
